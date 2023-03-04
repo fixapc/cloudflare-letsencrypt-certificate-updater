@@ -1,28 +1,36 @@
 #!/bin/bash
-#MUST HAVE CERTBOT INSTALLLED WITH DNS AUTHENTICATION PLUGIN AND WILDCARE CERTIFICATES ENABLED
 red=$(tput setaf 1)
 green=$(tput setaf 2)
 nocolor=$(tput -T ansi sgr0)
 certbotcreds=/tmp/4542235.ini
 cat <<EOF > "$certbotcreds"
-dns_cloudflare_email = "cloudflare email here"
-dns_cloudflare_api_key = "cloudflare GLOBAL api key here"
+dns_cloudflare_email = "your email here"
+dns_cloudflare_api_key = "your global api key here"
 EOF
 WeBsItEs=(
-website1.com
-website2.com
-website3.com
+wewbsite1.com
+wewbsite2.com
+wewbsite3.com
+wewbsite4.com
+wewbsite5.com
 )
+#FOR FREEBSD
+rm -r -f -v /usr/local/etc/letsencrypt/archive/*
+rm -r -f -v /usr/local/etc/letsencrypt/live/*
+rm -r -f -v /usr/local/etc/letsencrypt/keys/*
+rm -r -f -v /usr/local/etc/letsencrypt/csr/*
+rm -r -f -v /usr/local/etc/letsencrypt/renewal/*
+
+#FOR APT BASED DISTROS
+rm -r -f -v /etc/letsencrypt/archive/*
+rm -r -f -v /etc/letsencrypt/live/*
+rm -r -f -v /etc/letsencrypt/keys/*
+rm -r -f -v /etc/letsencrypt/csr/*
+rm -r -f -v /etc/letsencrypt/renewal/*
 for ((i=0; i<${#WeBsItEs[@]}; i++ )); do
-	if [[ $(find /etc/letsencrypt -iname "*""${WeBsItEs[$i]}""*") = "" ]] 
-		then	
-			echo "$red ${WeBsItEs[$i]} NOT FOUND SKIPPING CERTIFICATE UPDATE $nocolor"
-		else
-            find /etc/letsencrypt -iname "*""${WeBsItEs[$i]}""*" | xargs -I "{}" rm -r -f "{}"
-			certbot certonly -d  "${WeBsItEs[$i]},*.${WeBsItEs[$i]}" --cert-name="${WeBsItEs[$i]}" \
-			--agree-tos --no-autorenew  --staple-ocsp --dns-cloudflare --dns-cloudflare-credentials="$certbotcreds"
-			echo "$green ${WeBsItEs[$i]} CERTIFICATE FILES PRESENT, CLEANING CERTS AND RENEWING FOR ${WeBsItEs[$i]} $nocolor"
-	fi
+                        certbot certonly -d  "${WeBsItEs[$i]},*.${WeBsItEs[$i]}" --cert-name="${WeBsItEs[$i]}" \
+                        --agree-tos --no-autorenew  --staple-ocsp --dns-cloudflare --dns-cloudflare-credentials="$certbotcreds"
+                        echo "$green ${WeBsItEs[$i]} CERTIFICATE FILES PRESENT, CLEANING CERTS AND RENEWING FOR ${WeBsItEs[$i]} $nocolor"
 done
 echo "$green ${WeBsItEs[$i]} CLEANING CREDENTIALS FILE ${WeBsItEs[$i]} $nocolor"
 rm -f /tmp/"$certbotcreds"
